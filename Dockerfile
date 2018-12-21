@@ -1,6 +1,7 @@
 FROM ruby:2.5.3
 
-ENV APP_ROOT /rspec_app
+ENV APP_ROOT="/rspec_app"\
+    LANG="C.UTF-8"
 RUN curl -sL https://deb.nodesource.com/setup_10.x | bash -
 RUN apt-get update -qq && \
   apt-get install -y build-essential mysql-client nodejs unzip --no-install-recommends && \
