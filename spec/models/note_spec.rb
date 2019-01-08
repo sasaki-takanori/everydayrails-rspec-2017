@@ -49,10 +49,17 @@ RSpec.describe Note, type: :model do
       it "検索文字列に一致するノートを全て返すこと" do
         expect(Note.search("first")).to include(@note1, @note3)
       end
+
+      it "1件だけヒットするノートを返すこと" do
+        expect(Note.search("second")).to include(@note2)
+      end
+
     end
 
     context "検索結果にヒットしない時" do
       it "検索結果が１件も見つからなければからのコレクションを返すこと" do
+        # result = Note.search("message")
+        # pp result
         expect(Note.search("message")).to be_empty
       end
     end

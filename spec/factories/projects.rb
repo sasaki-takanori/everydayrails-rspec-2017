@@ -5,18 +5,30 @@ FactoryBot.define do
     due_on 1.week.from_now
     association :owner
 
+    # メモ付きのプロジェクト
     trait :with_notes do
-      after(:create) { |project| create_list(:note, 5, project: project) }
+      # 変数として受け取りたい部分をtransientとして定義する
+      # transientが渡されなかった場合のデフォルト値を設定する
+      transient do
+        note_count 5
+      end
+      # transientはevaluatorを使って呼び出す
+      after(:create) do |project, evaluator|
+        create_list(:note, evaluator.note_count, project: project)
+      end
     end
 
+    # 締切が昨日(締め切りを過ぎている)
     trait :due_yesterday do
       due_on 1.day.ago
     end
 
+    # 締切が今日
     trait :due_today do
       due_on Date.current.in_time_zone
     end
 
+    # 締切が明日
     trait :due_tomorrow do
       due_on 1.day.from_now
     end
