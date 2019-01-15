@@ -63,7 +63,7 @@ RSpec.describe ProjectsController, type: :controller do
   end
 
   describe "#create" do
-    context "忍性済みのユーザーとして" do
+    context "認証済みのユーザーとして" do
       before do
         @user = FactoryBot.create(:user)
       end
