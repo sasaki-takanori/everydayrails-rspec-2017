@@ -1,13 +1,13 @@
 require 'rails_helper'
 
 RSpec.describe "Projects", type: :system do
-  scenario "ユーザーは新しいプロジェクトを作成する" do
-    user = FactoryBot.create(:user)
-    # using our customer login helper:
-    # sign_in_as user
-    # or the one provided by Devise:
+  let(:user) { FactoryBot.create(:user) }
+  let(:project) { FactoryBot.create(:project, owner: user)}
+  before do
     sign_in user
+  end
 
+  scenario "ユーザーは新しいプロジェクトを作成する" do
     visit root_path
 
     expect {
@@ -25,10 +25,6 @@ RSpec.describe "Projects", type: :system do
   end
 
   scenario "ユーザーはプロジェクトを完了する" do
-    user = FactoryBot.create(:user)
-    project = FactoryBot.create(:project, owner: user)
-    sign_in user
-
     visit project_path(project)
 
     expect(page).to_not have_content "Completed"
@@ -40,5 +36,33 @@ RSpec.describe "Projects", type: :system do
       have_content "Congratulations, this project is complete!"
     expect(page).to have_content "Completed"
     expect(page).to_not have_button "Complete"
+  end
+
+  scenario "ユーザーはプロジェクトを編集する" do
+    visit edit_project_path(project)
+
+    fill_in "Name", with: "Edited Project"
+    fill_in "Description", with: "Edited Description"
+    click_button "Update Project"
+
+    aggregate_failures do
+      expect(page).to have_content "Project was successfully updated"
+      expect(page).to have_content "Edited Project"
+      expect(page).to have_content "Owner: #{user.name}"
+    end
+  end
+
+  scenario "ユーザーはプロジェクトの編集をキャンセルする", js: true do
+    visit edit_project_path(project)
+
+    fill_in "Name", with: "Edited Project"
+    fill_in "Description", with: "Edited Description"
+    click_link "Cancel"
+    page.driver.browser.switch_to.alert.accept
+
+    aggregate_failures do
+      expect(page).to have_content project.name
+      expect(page).to have_content "Owner: #{user.name}"
+    end
   end
 end
