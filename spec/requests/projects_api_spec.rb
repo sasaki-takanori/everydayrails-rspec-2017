@@ -7,8 +7,8 @@ describe 'Projects API', type: :request do
     FactoryBot.create(:project, name: "Second Sample Project", owner: user)
 
     get api_projects_path, params: {
-      user_email: user.email,
-      user_token: user.authentication_token
+        user_email: user.email,
+        user_token: user.authentication_token
     }
 
     expect(response).to have_http_status(:success)
@@ -17,8 +17,8 @@ describe 'Projects API', type: :request do
     project_id = json[0]["id"]
 
     get api_project_path(project_id), params: {
-      user_email: user.email,
-      user_token: user.authentication_token
+        user_email: user.email,
+        user_token: user.authentication_token
     }
 
     expect(response).to have_http_status(:success)
@@ -27,21 +27,32 @@ describe 'Projects API', type: :request do
     # Etc.
   end
 
-  it 'プロジェクトを作成できること' do
-    user = FactoryBot.create(:user)
-    FactoryBot.create(:project, name: "Sample Project")
-    FactoryBot.create(:project, name: "Second Sample Project", owner: user)
-
-    project_attributes = FactoryBot.attributes_for(:project)
-
-    expect {
-      post api_projects_path, params: {
-        user_email: user.email,
-        user_token: user.authentication_token,
-        project: project_attributes
-      }
-    }.to change(user.projects, :count).by(1)
-
-    expect(response).to have_http_status(:success)
+  describe 'GET /api/projects' do
+    it 'プロジェクト一覧を取得できること'
   end
+
+  describe 'POST /api/projects' do
+    it 'プロジェクトを作成できること' do
+      user = FactoryBot.create(:user)
+      FactoryBot.create(:project, name: "Sample Project")
+      FactoryBot.create(:project, name: "Second Sample Project", owner: user)
+
+      project_attributes = FactoryBot.attributes_for(:project)
+
+      expect {
+        post api_projects_path, params: {
+            user_email: user.email,
+            user_token: user.authentication_token,
+            project: project_attributes
+        }
+      }.to change(user.projects, :count).by(1)
+
+      expect(response).to have_http_status(:success)
+    end
+  end
+
+  describe 'GET /api/projects/:id' do
+    it 'プロジェクト詳細を取得できること'
+  end
+
 end
