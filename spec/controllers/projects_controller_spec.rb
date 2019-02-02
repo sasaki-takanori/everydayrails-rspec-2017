@@ -10,13 +10,10 @@ RSpec.describe ProjectsController, type: :controller do
       it "正常にレスポンスを返すこと" do
         sign_in @user
         get :index
-        expect(response).to be_success
-      end
-
-      it "レスポンスコード200を返すこと" do
-        sign_in @user
-        get :index
-        expect(response).to have_http_status "200"
+        aggregate_failures do
+          expect(response).to be_success
+          expect(response).to have_http_status "200"
+        end
       end
     end
 
@@ -113,7 +110,7 @@ RSpec.describe ProjectsController, type: :controller do
 
       it "プロジェクトを更新できること" do
         project_params = FactoryBot.attributes_for(:project,
-          name: "New Project Name")
+                                                   name: "New Project Name")
         sign_in @user
         patch :update, params: { id: @project.id, project: project_params }
         expect(@project.reload.name).to eq "New Project Name"
@@ -125,13 +122,13 @@ RSpec.describe ProjectsController, type: :controller do
         @user = FactoryBot.create(:user)
         other_user = FactoryBot.create(:user)
         @project = FactoryBot.create(:project,
-          owner: other_user,
-          name: "Same Old Name")
+                                     owner: other_user,
+                                     name: "Same Old Name")
       end
 
       it "プロジェクトを更新できないこと" do
         project_params = FactoryBot.attributes_for(:project,
-          name: "New Name")
+                                                   name: "New Name")
         sign_in @user
         patch :update, params: { id: @project.id, project: project_params }
         expect(@project.reload.name).to eq "Same Old Name"
