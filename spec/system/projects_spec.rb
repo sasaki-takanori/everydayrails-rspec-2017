@@ -1,8 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe "Projects", type: :system do
-  let(:user) { FactoryBot.create(:user) }
-  let(:project) { FactoryBot.create(:project, owner: user)}
+  include_context 'project setup'
   before do
     sign_in user
   end
@@ -39,10 +38,8 @@ RSpec.describe "Projects", type: :system do
   end
 
   scenario "ユーザーはプロジェクトを編集する" do
-    visit edit_project_path(project)
-
-    fill_in "Name", with: "Edited Project"
-    fill_in "Description", with: "Edited Description"
+    go_to_edit_project project.name
+    fill_in_edited
     click_button "Update Project"
 
     aggregate_failures do
@@ -53,10 +50,8 @@ RSpec.describe "Projects", type: :system do
   end
 
   scenario "ユーザーはプロジェクトの編集をキャンセルする", js: true do
-    visit edit_project_path(project)
-
-    fill_in "Name", with: "Edited Project"
-    fill_in "Description", with: "Edited Description"
+    go_to_edit_project project.name
+    fill_in_edited
     click_link "Cancel"
     page.driver.browser.switch_to.alert.accept
 
@@ -64,5 +59,16 @@ RSpec.describe "Projects", type: :system do
       expect(page).to have_content project.name
       expect(page).to have_content "Owner: #{user.name}"
     end
+  end
+
+  def go_to_edit_project(name)
+    visit root_path
+    click_link name
+    click_link "Edit"
+  end
+
+  def fill_in_edited
+    fill_in "Name", with: "Edited Project"
+    fill_in "Description", with: "Edited Description"
   end
 end
